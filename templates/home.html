@@ -11,7 +11,13 @@
                 <div class="card mb-4">
                   <div class="card-body">
                     <div class="media mb-3">
-                      <img src="{{ review.user.profile_picture.url }}" class="d-block w-25 p-3 rounded-circle " alt="">
+                      <a href="{% if request.user == review.user %}
+                      {{ profile_url }}
+                      {% else %}
+                      {% url 'users:profile' review.user.id %}
+                      {% endif %}">
+                        <img src="{{ review.user.profile_picture.url }}" class="d-block w-25 p-3 rounded-circle " alt="">
+                      </a>
                       <div class="media-body ml-3">
                         <b>{{ review.user.username }}</b> reted this book {{ review.stars_given }} stars
                         <div class="text-muted small">{{ review.created_at | date:"M d,Y"}}</div>

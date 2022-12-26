@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import View
 from users.forms import UserCreateForm, UserUpdateForm
+from users.models import CustomUser
 
 
 class RegisterView(View):
@@ -45,10 +47,11 @@ class LoginView(View):
 
 
 class ProfileView(LoginRequiredMixin, View):
-    def get(self, request):
+    def get(self, request, id):
+        user = CustomUser.objects.get(id=id)
         if not request.user.is_authenticated:
             return redirect("users:login")
-        return render(request, "users/profile.html", {"user": request.user})
+        return render(request, "users/profile.html", {"user": user})
 
 
 class LogoutView(LoginRequiredMixin,View):
@@ -59,21 +62,27 @@ class LogoutView(LoginRequiredMixin,View):
 
 
 class ProfileUpdateView(LoginRequiredMixin, View):
-    def get(self, request):
-        user_update_form = UserUpdateForm(instance=request.user)
-        return render(request, "users/profile_edit.html", {'form':user_update_form})
+    def get(self, request, id):
+        user = CustomUser.objects.get(id=id)
+        user_update_form = UserUpdateForm(instance=user)
+        if request.user == user:
+            return render(request, "users/profile_edit.html", {'form':user_update_form})
+        return redirect(reverse("users:profile", kwargs={"id":id}))
+        
     
-    def post(self, request):
+    def post(self, request, id):
+        user = CustomUser.objects.get(id=id)
         user_update_form = UserUpdateForm(
-            instance=request.user,
+            instance=user,
             data=request.POST,
             files=request.FILES
         )
-
-        if user_update_form.is_valid():
-            user_update_form.save()
-            messages.success(request, "You have successfully updated your profile.")
-            return redirect("users:profile")
-        
-        return render(request, "users/profile_edit.html", {"form":user_update_form})
+        if request.user == user:
+            if user_update_form.is_valid():
+                user_update_form.save()
+                messages.success(request, "You have successfully updated your profile.")
+                return redirect(reverse("users:profile", kwargs={"id":user.id}))
             
+            return render(request, "users/profile_edit.html", {"form":user_update_form})
+        
+        return redirect(reverse("users:profile", kwargs={"id":id}))

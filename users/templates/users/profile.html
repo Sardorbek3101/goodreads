@@ -9,8 +9,12 @@
     <span class="name mt-3">{{ user.first_name }} {{ user.last_name }}</span>
     <span class="idd">@{{ user.username }}</span>
     <span class="idd">{{ user.email }}</span>
-    <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'users:profile-edit' %}">Edit Profile</a></div>
-    <div class=" px-2 rounded mt-4 date "><span class="join">Joined {{ user.date_joined | date:"M d, Y" }}</span></div>
+    {% if request.user == user %}
+        <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'users:profile-edit' user.id %}">Edit Profile</a></div>
+        <div class=" px-2 rounded mt-4 date "><span class="join">Joined {{ user.date_joined | date:"M d, Y" }}</span></div>
+    {% else %}
+        <div class=" d-flex mt-2"><a class="btn btn-dark" href="#">Добавить в друзья</a></div>
+    {% endif %}
 </div>
 
 
