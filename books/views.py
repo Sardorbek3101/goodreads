@@ -41,7 +41,7 @@ class BookDetailView(View):
         return render(request, "books/detail.html", {"book": book, "review_form": review_form})
 
 
-class AddReviewView(View, LoginRequiredMixin):
+class AddReviewView(LoginRequiredMixin, View):
     def post(self, request, id):
         book = Book.objects.get(id=id)
         review_form = BookReviewForm(data=request.POST)

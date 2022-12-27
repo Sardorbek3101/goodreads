@@ -134,10 +134,10 @@ class LoginTestCase(TestCase):
 
 class ProfileTestCase(TestCase):
     def test_login_required(self):
-        response = self.client.get(reverse("users:profile"))
+        response = self.client.get(reverse("users:profile", kwargs={"id":1}))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("users:login") + "?next=/users/profile/")
+        self.assertEqual(response.url, reverse("users:login") + "?next=/users/profile/1")
 
     def test_profile_details(self):
         user = CustomUser.objects.create(
@@ -151,7 +151,7 @@ class ProfileTestCase(TestCase):
 
         self.client.login(username="Sardorbek31", password="somepassword")
 
-        response = self.client.get(reverse("users:profile"))
+        response = self.client.get(reverse("users:profile", kwargs={"id":user.id}))
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, user.username)
@@ -169,7 +169,7 @@ class ProfileTestCase(TestCase):
         self.client.login(username="Sardorbek31", password="somepass")
 
         response = self.client.post(
-            reverse("users:profile-edit"),
+            reverse("users:profile-edit", kwargs={"id":user.id}),
             data={
                 "username": "Sardorbek3101",
                 "first_name": "Sardor",
@@ -182,4 +182,4 @@ class ProfileTestCase(TestCase):
         self.assertEqual(user.username, "Sardorbek3101")
         self.assertEqual(user.first_name, "Sardor")
         self.assertEqual(user.email, "oscodeer3@gmail.com")
-        self.assertEqual(response.url, reverse("users:profile"))
+        self.assertEqual(response.url, reverse("users:profile", kwargs={"id":user.id}))
