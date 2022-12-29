@@ -13,9 +13,11 @@
         <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'users:profile-edit' user.id %}">Edit Profile</a></div>
         <div class=" px-2 rounded mt-4 date "><span class="join">Joined {{ user.date_joined | date:"M d, Y" }}</span></div>
     {% else %}
+    {% if request.user.is_authenticated %}
         <div class=" d-flex mt-2"><a class="btn btn-dark" href="#">Добавить в друзья</a></div>
     {% endif %}
-</div>
 
+    {% endif %}
+</div>
 
 {% endblock %}

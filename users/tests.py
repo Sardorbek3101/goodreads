@@ -133,11 +133,11 @@ class LoginTestCase(TestCase):
 
 
 class ProfileTestCase(TestCase):
-    def test_login_required(self):
-        response = self.client.get(reverse("users:profile", kwargs={"id":1}))
+    # def test_login_required(self):
+    #     response = self.client.get(reverse("users:profile", kwargs={"id":1}))
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("users:login") + "?next=/users/profile/1")
+    #     self.assertEqual(response.status_code, 302)
+    #     self.assertEqual(response.url, reverse("users:login") + "?next=/users/profile/1")
 
     def test_profile_details(self):
         user = CustomUser.objects.create(

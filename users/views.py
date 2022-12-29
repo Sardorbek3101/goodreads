@@ -46,11 +46,11 @@ class LoginView(View):
             return render(request, "users/login.html", {"login_form": login_form})
 
 
-class ProfileView(LoginRequiredMixin, View):
+class ProfileView(View):
     def get(self, request, id):
         user = CustomUser.objects.get(id=id)
-        if not request.user.is_authenticated:
-            return redirect("users:login")
+        # if not request.user.is_authenticated:
+        #     return redirect("users:login")
         return render(request, "users/profile.html", {"user": user})
 
 
