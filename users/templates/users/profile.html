@@ -17,7 +17,8 @@
             {% if response == 'friends' %}
             <br>
             <div class="dropdown">
-                <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Друг</button>
+                <a href="#" class="btn btn-dark">Написать</a>
+                <i class="btn btn-dark dropdown-toggle bi bi-person-check" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="{% url 'friends:conf_del_friend' user.id %}">Удалить друга</a></li>
                 </ul>
