@@ -49,9 +49,18 @@ class LoginView(View):
 class ProfileView(View):
     def get(self, request, id):
         user = CustomUser.objects.get(id=id)
-        # if not request.user.is_authenticated:
-        #     return redirect("users:login")
-        return render(request, "users/profile.html", {"user": user})
+        response = ''
+        for to in request.user.friendship_requests_from.all():
+            if to.to_user == user:
+                response = 'request'
+        for n in request.user.friends_to.all():
+            if n.from_user == user:
+                response = 'friends'
+        for n in request.user.friends_from.all():
+            if n.to_user == user:
+                response = 'friends'
+
+        return render(request, "users/profile.html", {"user": user, "response":response})
 
 
 class LogoutView(LoginRequiredMixin,View):

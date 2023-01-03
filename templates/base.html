@@ -39,9 +39,11 @@
                                         {{ request.user.username }}
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="{% url 'users:profile' request.user.id %}">Profile</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'users:profile' request.user.id %}">Профиль</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'friends:friends' %}">Друзья</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'friends:friends_requests' %}">Запросы на дружбу</a></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="{% url 'users:logout' %}">Logout</a></li>
+                                        <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>
                                     </ul>
                                 </li>
                             </ul>

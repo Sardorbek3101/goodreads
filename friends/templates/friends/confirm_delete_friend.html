@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Вы точно хотите удалить {{ user.username }} из друзей ?</h3>
+
+<a href="{% url 'users:profile' user.id %}">Нет</a> | <a href="{% url 'friends:delete_friend' user.id %}">Да</a>
+
+{% endblock content %}

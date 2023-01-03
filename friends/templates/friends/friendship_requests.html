@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Запросы на дружбу</h3>
+{% if user.friendship_requests_to.all %}
+{% for f_request in user.friendship_requests_to.all %}
+
+<p><a href="{% url 'users:profile' f_request.from_user.id %}">{{ f_request.from_user.username }}</a> / <a href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подвердить</a></p>
+
+{% endfor %}
+{% else %}
+Запросов не найдено
+{% endif %}
+{% endblock content %}

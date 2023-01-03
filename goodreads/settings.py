@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     #Внутренние
     'books',
     'users',
+    'friends',
     'api',
     #Внешние
     "crispy_forms",

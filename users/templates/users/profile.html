@@ -13,10 +13,21 @@
         <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'users:profile-edit' user.id %}">Edit Profile</a></div>
         <div class=" px-2 rounded mt-4 date "><span class="join">Joined {{ user.date_joined | date:"M d, Y" }}</span></div>
     {% else %}
-    {% if request.user.is_authenticated %}
-        <div class=" d-flex mt-2"><a class="btn btn-dark" href="#">Добавить в друзья</a></div>
-    {% endif %}
-
+        {% if request.user.is_authenticated %}
+            {% if response == 'friends' %}
+            <br>
+            <div class="dropdown">
+                <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Друг</button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'friends:conf_del_friend' user.id %}">Удалить друга</a></li>
+                </ul>
+              </div>
+            {% elif response == 'request' %}
+                <div class="btn btn-dark d-flex mt-2">Заявка на дружбу отправлена</div>
+            {% else %} 
+                <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'friends:create_friendship' user.id %}">Добавить в друзья</a></div>
+            {% endif %}     
+        {% endif %}
     {% endif %}
 </div>
 
