@@ -41,6 +41,17 @@ class CreateFriendshipRequestView(View):
 
         return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
     
+class DontFriendshipView(LoginRequiredMixin ,View):
+    def get(self, request, id):
+        from_user = CustomUser.objects.get(id=id)
+        for n in request.user.friendship_requests_to.all():
+            if n.from_user == from_user:
+                n.delete()
+                return redirect("home_page")
+            else:
+                messages.warning(request, f"Пользователь {from_user.username} не отправлял вам запрос на дружбу !")
+                return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
+
 class ConfirmFriendshipView(View):
     def get(self, request, id):
         from_user = CustomUser.objects.get(id=id)
