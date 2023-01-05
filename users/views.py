@@ -50,17 +50,20 @@ class ProfileView(View):
     def get(self, request, id):
         user = CustomUser.objects.get(id=id)
         response = ''
+        friends = None
         for to in request.user.friendship_requests_from.all():
             if to.to_user == user:
                 response = 'request'
         for n in request.user.friends_to.all():
             if n.from_user == user:
                 response = 'friends'
+                friends = n
         for n in request.user.friends_from.all():
             if n.to_user == user:
                 response = 'friends'
+                friends = n
 
-        return render(request, "users/profile.html", {"user": user, "response":response})
+        return render(request, "users/profile.html", {"user": user, "response":response, "friends":friends})
 
 
 class LogoutView(LoginRequiredMixin,View):

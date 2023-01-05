@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
-from friends.models import Friendship, FriendshipRequest
+from friends.models import FriendChat, Friendship, FriendshipRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from users.models import CustomUser
+from friends.forms import FriendChatForm
 
 
 class FriendshipRequestView(LoginRequiredMixin, View):
@@ -103,3 +104,56 @@ class DeleteFriendshipView(View):
 
         messages.success(request, "Удаление завершено успешно !")
         return redirect("home_page")
+    
+
+class FriendsChatView(View):
+    def get(self, request, id):
+        friends = Friendship.objects.get(id=id)
+        friend_chat_form = FriendChatForm(request.POST)
+        if friends.to_user == request.user:
+            raz = 'true'
+        elif friends.from_user == request.user:
+            raz = 'true'
+        else:
+            raz = 'false'
+        if raz == 'true':
+            chat = friends.friendchat_set.all()
+            return render(request, "friends/friend_chat.html", {"chat":chat, "friends":friends, "form": friend_chat_form})
+        else:
+            messages.warning(request, "Извините но вам не разрешено читать чужие сообщения !")
+            return redirect("home_page")
+    
+    def post(self, request, id):
+        friends = Friendship.objects.get(id=id)
+        friend_chat_form = FriendChatForm(request.POST)
+        if friends.to_user == request.user:
+            raz = 'true'
+        elif friends.from_user == request.user:
+            raz = 'true'
+        else:
+            raz = 'false'
+        if raz == 'true':
+            chat = friends.friendchat_set.all()
+        
+            if request.FILES:
+                file = request.FILES['file']
+            else:
+                file = ''
+
+            if friend_chat_form.is_valid():
+                if friend_chat_form.cleaned_data['text'] == '' and file=='':
+                    messages.warning(request, "Вы не можете отправлять пустое значение !")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+                else:
+                    FriendChat.objects.create(
+                        friends = friends,
+                        user = request.user,
+                        text = friend_chat_form.cleaned_data['text'],
+                        file = file
+                    )
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+            else:
+                return render(request, "friends/friend_chat.html", {"chat":chat, "friends":friends, "form": friend_chat_form})
+        else:
+            messages.warning(request, "Извините но вам не разрешено писать чужим пользователям !")
+            return redirect("home_page")

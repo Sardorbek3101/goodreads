@@ -21,3 +21,14 @@ class Friendship(models.Model):
 
     def __str__(self):
         return f"{self.to_user.username } И {self.from_user.username}"
+    
+
+class FriendChat(models.Model):
+    friends = models.ForeignKey(Friendship, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    text = models.TextField(blank=True, null=True)
+    file = models.ImageField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"От {self.user} в чат"

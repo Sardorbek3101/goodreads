@@ -3,10 +3,10 @@
 {% block content %}
 <h3>Друзья</h3>
 {% for n in user.friends_to.all %}
-<p><a href="{% url 'users:profile' n.from_user.id %}">{{ n.from_user }}</a></p>
+<p><a href="{% url 'friends:friends_chat' n.id %}">{{ n.from_user }}</a></p>
 {% endfor %}
 {% for n in user.friends_from.all %}
-<p><a href="{% url 'users:profile' n.to_user.id %}">{{ n.to_user }}</a></p>
+<p><a href="{% url 'friends:friends_chat' n.id %}">{{ n.to_user }}</a></p>
 {% endfor %}
 
 {% endblock content %}

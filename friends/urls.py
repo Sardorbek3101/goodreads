@@ -1,5 +1,5 @@
 from django.urls import path
-from friends.views import FriendshipRequestView, CreateFriendshipRequestView, ConfirmFriendshipView, DontFriendshipView, ConfirmDeleteFriendshipView, DeleteFriendshipView, FriendsView
+from friends.views import FriendsChatView, FriendshipRequestView, CreateFriendshipRequestView, ConfirmFriendshipView, DontFriendshipView, ConfirmDeleteFriendshipView, DeleteFriendshipView, FriendsView
 
 app_name = "friends"
 
@@ -10,5 +10,6 @@ urlpatterns = [
     path('confirm/friendhip/<int:id>/', ConfirmFriendshipView.as_view(), name="confirm_friendship"),
     path('delete/request/<int:id>/', DontFriendshipView.as_view(), name="delete_request"),
     path("confirm/delete/friend/<int:id>/", ConfirmDeleteFriendshipView.as_view(), name="conf_del_friend"),
-    path('delete/friend/<int:id>/', DeleteFriendshipView.as_view(), name="delete_friend")
+    path('delete/friend/<int:id>/', DeleteFriendshipView.as_view(), name="delete_friend"),
+    path('chat/<int:id>/', FriendsChatView.as_view(), name="friends_chat")
 ]
