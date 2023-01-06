@@ -3,6 +3,18 @@
 {% block content %}
 <div class="row">
 <div class="col-5">
+{% if form.id %}
+<h3>вы точно хотите удалить сообщение ?</h3>
+{% if form.text and form.file %}
+<p>{{ form.text }}</p>
+<img class="chat_img" src="{{ form.file.url }}" alt="error"><br><br>
+{% elif form.text %}
+<p>{{ form.text }}</p>
+{% elif form.file %}
+<img class="chat_img" src="{{ form.file.url }}" alt="error"><br><br>
+{% endif %}
+<p><a class="btn btn-primary" href="{% url 'friends:friends_chat' friends.id %}">Нет</a> | <a class="btn btn-danger" href="{% url 'friends:delete_message' friends.id form.id %}">Да</a></p>
+{% else %}
 <h5>Отправить сообщение</h5>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
@@ -10,6 +22,7 @@
     {{ form | crispy }}
     <button class="btn btn-success" type="submit">Send</button>
 </form>
+{% endif %}
 </div>
 <div class="col-5 center">
     <h3>
@@ -22,7 +35,10 @@
     
     {% for c in chat %}
     
-    <p><b>{{ c.user.username }}</b> {{ c.text }}</p>
+    <p><b>{{ c.user.username }}</b> {{ c.text }}
+        {% if c.user == request.user %}
+        |  <a href="{% url 'friends:friends_chat' friends.id %}?change={{ c.id }}"><i class="bi bi-pen"></i></a> | <a href="{% url 'friends:friends_chat' friends.id %}?delete={{ c.id }}"><i class="bi bi-trash"></i></a></p>
+        {% endif %}
     {% if c.file %}
     <a href="{{ c.file.url }}"><img class="chat_img" src="{{ c.file.url }}" alt="error"></a>
     {% endif %}

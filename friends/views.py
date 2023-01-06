@@ -109,7 +109,6 @@ class DeleteFriendshipView(View):
 class FriendsChatView(View):
     def get(self, request, id):
         friends = Friendship.objects.get(id=id)
-        friend_chat_form = FriendChatForm(request.POST)
         if friends.to_user == request.user:
             raz = True
         elif friends.from_user == request.user:
@@ -117,7 +116,25 @@ class FriendsChatView(View):
         else:
             raz = False
         if raz:
-            chat = friends.friendchat_set.all()
+            friend_chat_form = FriendChatForm()
+            change = request.GET.get("change", "")
+            delete = request.GET.get("delete", "")
+            if change:
+                msg = FriendChat.objects.get(id=change)
+                if msg.user == request.user:
+                    friend_chat_form = FriendChatForm(instance=msg)
+                else:
+                    messages.warning(request, "Вам не разрешено изменить сообшения других пользователей!")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+            elif delete:
+                msg = FriendChat.objects.get(id=delete)
+                if msg.user == request.user:
+                    friend_chat_form = msg
+                else:
+                    messages.warning(request, "Вам не разрешено удалить сообшения других пользователей!")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+
+            chat = friends.friendchat_set.all().order_by('created_at')
             return render(request, "friends/friend_chat.html", {"chat":chat, "friends":friends, "form": friend_chat_form})
         else:
             messages.warning(request, "Извините но вам не разрешено читать чужие сообщения !")
@@ -125,7 +142,6 @@ class FriendsChatView(View):
     
     def post(self, request, id):
         friends = Friendship.objects.get(id=id)
-        friend_chat_form = FriendChatForm(request.POST)
         if friends.to_user == request.user:
             raz = True
         elif friends.from_user == request.user:
@@ -133,14 +149,31 @@ class FriendsChatView(View):
         else:
             raz = False
         if raz:
+            friend_chat_form = FriendChatForm(data=request.POST)
             chat = friends.friendchat_set.all()
+            change = request.GET.get("change", "")
         
             if request.FILES:
                 file = request.FILES['file']
             else:
                 file = ''
-
-            if friend_chat_form.is_valid():
+            if change:
+                msg = FriendChat.objects.get(id=change)
+                if msg.user == request.user:
+                    friend_chat_form = FriendChatForm(instance=msg, data=request.POST, files=request.FILES)
+                    if friend_chat_form.is_valid():
+                        if friend_chat_form.cleaned_data['text'] == '' and file=='':
+                            messages.warning(request, "Вы не можете отправлять пустое значение !")
+                            return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+                        else:
+                            friend_chat_form.save()
+                            return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+                    else:
+                        return render(request, "friends/friend_chat.html", {"chat":chat, "friends":friends, "form": friend_chat_form})
+                else:
+                    messages.warning(request, "Вам не разрешено изменить сообшения других пользователей!")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+            elif friend_chat_form.is_valid():
                 if friend_chat_form.cleaned_data['text'] == '' and file=='':
                     messages.warning(request, "Вы не можете отправлять пустое значение !")
                     return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
@@ -157,3 +190,15 @@ class FriendsChatView(View):
         else:
             messages.warning(request, "Извините но вам не разрешено писать чужим пользователям !")
             return redirect("home_page")
+        
+
+class DeleteMessageView(LoginRequiredMixin,View):
+    def get(self, request, msg_id, id):
+        msg = FriendChat.objects.get(id=msg_id)
+        if msg.user == request.user:
+            msg.delete()
+            return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+        else:
+            messages.warning(request, "Вам не разрешено удалить сообшения других пользователей!")
+            return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
+
