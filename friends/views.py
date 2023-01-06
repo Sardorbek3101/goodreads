@@ -127,12 +127,12 @@ class FriendsChatView(View):
         friends = Friendship.objects.get(id=id)
         friend_chat_form = FriendChatForm(request.POST)
         if friends.to_user == request.user:
-            raz = 'true'
+            raz = True
         elif friends.from_user == request.user:
-            raz = 'true'
+            raz = True
         else:
-            raz = 'false'
-        if raz == 'true':
+            raz = False
+        if raz:
             chat = friends.friendchat_set.all()
         
             if request.FILES:
