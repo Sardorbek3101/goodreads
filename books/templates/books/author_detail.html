@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row mb-4">
+    <div class="col-2">
+        <img class="author-pic" src="{{ author.photo.url }}" alt="cover image">
+    </div>
+    <div class="col-6 ms-3">
+        <h3>{{ author.full_name }}</h3>
+        <span class="fst-italic">
+            {% for book_author in author.bookauthor_set.all %}
+                {% if forloop.last %}
+                    {{ book_author.book.title }}
+                {% else %}
+                    {{ book_author.book.title }},
+                {% endif %}
+            {% endfor %}
+        </span>
+        <p>{{ author.bio }}</p>
+    </div>
+</div>  
+
+{% endblock content %}

@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.views import View
 from books.forms import BookReviewForm
 # from django.views.generic import ListView, DetailView
-from books.models import Book, BookReview
+from books.models import Book, BookReview, Author
 
 
 # class BooksView(ListView):
@@ -94,4 +94,22 @@ class DeleteReviewView(LoginRequiredMixin, View):
         messages.success(request, "You have successfully deleted this review")
 
         return redirect(reverse("books:detail", kwargs={"id": book.id}))
-        
+    
+
+class AuthorsView(View):
+    def get(self, request):
+        authors = Author.objects.all().order_by("id")
+        search = request.GET.get("q", "")
+        if search:
+            authors = authors.filter(first_name__icontains=search)
+        page_size = request.GET.get("page_size", 4)
+        paginator = Paginator(authors, page_size)
+        page = request.GET.get("page", "")
+        page_obj = paginator.get_page(page)
+        return render(request, "books/authors.html", {"page_obj":page_obj, "search_query":search})
+    
+
+class AuthorDetailView(View):
+    def get(self, request, id):
+        author = Author.objects.get(id=id)
+        return render(request, "books/author_detail.html", {"author":author})
