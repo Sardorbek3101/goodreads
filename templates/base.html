@@ -1,8 +1,10 @@
 {% load static %}
 {% url 'home_page' as home_page_url %}
 {% url 'books:list' as books_page_url %}
-{% url 'users:profile' as profile_page_url %}
-{% url 'users:profile-edit' as profile_edit_page_url %}
+{% url 'users:profile' request.user.id as profile_page_url %}
+{% url 'users:profile-edit' request.user.id as profile_edit_page_url %}
+{% url 'friends:friends_requests' as friends_requests_url %}
+{% url 'friends:friends' as friends_urls %}
 {% url 'books:authors' as authors_url %}
 <!DOCTYPE html>
 <html lang="en">
@@ -14,9 +16,71 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css">
 </head>
-<body class="mx-5">
+<body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <nav id="nav">
+            <div class="ch1">
+                <a href="{% url 'landing_page' %}"><h2>Goodreads Clone</h2></a>
+            </div>
+            <div class="ch2">
+                <ul>
+                    <li><a class="{% if request.path == home_page_url %}activee{% endif %}" href="{{ home_page_url }}">Домой</a></li>
+                    <li><a class="{% if request.path == books_page_url %}activee{% endif %}" href="{{ books_page_url }}">Книги</a></li>
+                    <li><a class="{% if request.path == authors_url %}activee{% endif %}" href="{{ authors_url }}">Авторы</a></li>
+                </ul>
+            </div>
+            <div class="ch3">
+            {% if request.user.is_authenticated %}
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ request.user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item {% if request.path == profile_page_url %}active{% endif %}" href="{% url 'users:profile' request.user.id %}">Профиль</a></li>
+                            <li><a class="dropdown-item {% if request.path == friends_urls %}active{% endif %}" href="{% url 'friends:friends' %}">Друзья</a></li>
+                            <li><a class="dropdown-item position-relative {% if request.path == friends_requests_url %}active{% endif %}" href="{% url 'friends:friends_requests' %}">Запросы на дружбу
+                                {% if request.user.friendship_requests_to.all.count > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ request.user.friendship_requests_to.all.count }}
+                                <span class="visually-hidden">unread messages</span></span>
+                                {% endif %}
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            {% else %}
+            <a href="#">Войти</a>
+            {% endif %}
+        </div>
+        </nav>
+    </header>
+<main>
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mt-4">
+                    <div class="alert alert-{{ message.tags }}" role="alert">
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    {%  block content%}{% endblock content %}
+    </div>
+</main>
+<div class="vverx">
+    <a href="#nav">&uarr;</a>
+</div>
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+</body>
+</html>
+
+        {% comment %} <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'landing_page' %}">Goodreads clone</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,24 +127,4 @@
                     </div>
                 </div>
             </div>
-        </nav>
-    </header>
-<main>
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="mt-4">
-                    <div class="alert alert-{{ message.tags }}" role="alert">
-                        {{ message }}
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-    {%  block content%}{% endblock %}
-    </div>
-</main>
-<!-- JavaScript Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-</body>
-</html>
+        </nav> {% endcomment %}

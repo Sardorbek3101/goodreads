@@ -26,7 +26,7 @@
         </div>
     {% endfor %}
 
-    <nav>
+    <div>
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item"><a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}">&laquo; first</a></li>
@@ -38,7 +38,7 @@
                 <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query%}&q={{ search_query }}{% endif %}">last &raquo;</a></li>
             {% endif %}
       </ul>
-    </nav>
+    </div>
 
 {% else %}
     No authors found.

@@ -30,7 +30,7 @@
         </div>
     </div> 
     {% endfor %}
-    <nav>
+    <div>
         <ul class="pagination">
             {% if page_obj.has_previous %}
                 <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
@@ -42,5 +42,5 @@
                 <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a></li>
             {% endif %}
       </ul>
-    </nav>
+    </div>
 {% endblock %}
