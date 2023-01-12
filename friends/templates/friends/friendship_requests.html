@@ -2,11 +2,32 @@
 
 {% block content %}
 
-<h3>Запросы на дружбу</h3>
+<h4>Запросы на дружбу</h4>
 {% if user.friendship_requests_to.all %}
 {% for f_request in user.friendship_requests_to.all %}
-
-<p><a href="{% url 'users:profile' f_request.from_user.id %}">{{ f_request.from_user.username }}</a> | <a href="{% url 'friends:delete_request' f_request.from_user.id %}">Отклонить</a> | <a href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подвердить</a></p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="people-nearby">
+              <div class="nearby-user">
+                <div class="row">
+                  <div class="col-md-2 col-sm-2">
+                    <img src="{{ f_request.from_user.profile_picture.url }}" alt="user" class="profile-photo-lg">
+                  </div>
+                  <div style="width: 53.333333%" class="col-md-7 col-sm-7">
+                    <h5><a href="{% url 'users:profile' f_request.from_user.id %}" class="profile-link">{{ f_request.from_user }}</a></h5>
+                    <p>{{ f_request.from_user.first_name }} {{ f_request.from_user.last_name }}</p>
+                  </div>
+                  <div style="width: 30%" class="col-md-3 col-sm-3">
+                    <a class="btn btn-danger pull-right" href="{% url 'friends:delete_request' f_request.from_user.id %}">Отклонить</a>
+                    <a class="btn btn-primary pull-right" href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подвердить</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+    	</div>
+	</div>
+</div>
 
 {% endfor %}
 {% else %}
