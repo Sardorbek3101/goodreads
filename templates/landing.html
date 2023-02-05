@@ -1,10 +1,164 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
-<h1>Landing Page</h1>
 
-<p>Goodreads is an American social cataloging website and a subsidiary of Amazon[1] that allows individuals to search its database of books, annotations, quotes, and reviews. Users can sign up and register books to generate library catalogs and reading lists. They can also create their own groups of book suggestions, surveys, polls, blogs, and discussions. The website's offices are located in San Francisco.[2]
-Goodreads was founded in December 2006 and launched in January 2007 by Otis Chandler and Elizabeth Khuri Chandler.[3][4] In December 2007, the site had 650,000 members[5] and 10,000,000 books had been added.[6] By July 2012, the site reported 10 million members, 20 million monthly visits, and thirty employees.[7] On March 28, 2013, Amazon announced its acquisition of Goodreads,[8] and by July 23, 2013, Goodreads announced their user base had grown to 20 million members.[9]
-By July 2019, the site had 90 million members.[10]</p>
+<div class="posts">    
+{% for p in posts %}
+    <div id="post-{{ p.id }}" class="post">
+        <div class="user">
+            <img class="small-profile-picture" src="{{ p.author.profile_picture.url }}" alt="">
+            <a href="{% url 'users:profile' p.author.id %}"><h4>{{ p.author }}</h4></a>
+        </div>
+        <h4>{{ p.title }}</h4>
+        {% if p.file %}
+            {% if p.file.url|slice:"-4:" == ".mp4" %}
+                <video class="{{ p.id }}" loop="loop" style="height:300px; width:100%" controls="controls" muted>
+                    <source src="{{ p.file.url }}" type="video/mp4" /> 
+                </video>
+            {% else %}
+                <img style="height:100%; width:100%"src="{{ p.file.url }}" alt="">
+            {% endif %}
+        {% endif %}
+        {% if p.text %}
+            <p>{{ p.text | truncatechars:250}}</p>
+        {% endif %}
+        <p>{{ p.created_at }}</p>
+        <div class="like-com">
+            {% if request.user in p.likes.all %}
+                <form method="post" action="{% url 'posts:delete_like' %}">
+                    {% csrf_token %}
+                    <input name="post" type="hidden" value="{{ p.id }}">
+                    <button style="border:none; background:none;padding: unset" type="submit"><i style="color:red" class="bi bi-heart-fill"></i></button>{{ p.likes.all.count }}
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'posts:like' %}">
+                    {% csrf_token %}
+                    <input name="post" type="hidden" value="{{ p.id }}">
+                    <button style="border:none; background:none;padding: unset" type="submit"><i class="bi bi-heart"></i></button>{{ p.likes.all.count }}
+                    </form>
+            {% endif %}
+            <a href="{% url 'landing_page' %}?comments={{ p.id }}">коментарии</a>
+        </div>
+    </div>
+    {% comment %} {% if p.file.url|slice:"-4:" == ".mp4" %}
+    <script>
+        // Plugin isInViewport
+    !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(require("jquery"),require("window")):"function"==typeof define&&define.amd?define("isInViewport",["jquery","window"],n):n(e.$,e.window)}(this,function(e,n){"use strict";function t(n){var t=this;if(1===arguments.length&&"function"==typeof n&&(n=[n]),!(n instanceof Array))throw new SyntaxError("isInViewport: Argument(s) passed to .do/.run should be a function or an array of functions");return n.forEach(function(n){"function"!=typeof n?(console.warn("isInViewport: Argument(s) passed to .do/.run should be a function or an array of functions"),console.warn("isInViewport: Ignoring non-function values in array and moving on")):[].slice.call(t).forEach(function(t){return n.call(e(t))})}),this}function o(n){var t=e("<div></div>").css({width:"100%"});n.append(t);var o=n.width()-t.width();return t.remove(),o}function r(t,i){var a=t.getBoundingClientRect(),u=a.top,c=a.bottom,f=a.left,l=a.right,d=e.extend({tolerance:0,viewport:n},i),s=!1,p=d.viewport.jquery?d.viewport:e(d.viewport);p.length||(console.warn("isInViewport: The viewport selector you have provided matches no element on page."),console.warn("isInViewport: Defaulting to viewport as window"),p=e(n));var w=p.height(),h=p.width(),v=p[0].toString();if(p[0]!==n&&"[object Window]"!==v&&"[object DOMWindow]"!==v){var g=p[0].getBoundingClientRect();u-=g.top,c-=g.top,f-=g.left,l-=g.left,r.scrollBarWidth=r.scrollBarWidth||o(p),h-=r.scrollBarWidth}return d.tolerance=~~Math.round(parseFloat(d.tolerance)),d.tolerance<0&&(d.tolerance=w+d.tolerance),l<=0||f>=h?s:s=d.tolerance?u<=d.tolerance&&c>=d.tolerance:c>0&&u<=w}function i(n){if(n){var t=n.split(",");return 1===t.length&&isNaN(t[0])&&(t[1]=t[0],t[0]=void 0),{tolerance:t[0]?t[0].trim():void 0,viewport:t[1]?e(t[1].trim()):void 0}}return{}}e="default"in e?e.default:e,n="default"in n?n.default:n,
+    e.extend(e.expr[":"],{"in-viewport":e.expr.createPseudo?e.expr.createPseudo(function(e){return function(n){return r(n,i(e))}}):function(e,n,t){return r(e,i(t[3]))}}),e.fn.isInViewport=function(e){return this.filter(function(n,t){return r(t,e)})},e.fn.run=t});
+    //# isInViewport
 
+    // Play Video
+    $(function() {
+    var $video = $('.{{ p.id }}');
+    var $window = $(window);
+
+    $window.scroll(function() {
+    if ($video.is(":in-viewport")) {
+        $video[0].play();
+    } else {    
+        $video[0].pause();
+    }
+    });
+    });
+    </script>
+    {% endif %} {% endcomment %}
+{% endfor %}
+</div>
+{% if com_post %}
+<div class="black-window">
+    <a class="window-link" href="{% url 'landing_page' %}#post-{{com_post.id}}"><i class="bi bi-x"></i></a>
+    <div class="post-comments"> 
+        <div class="post post-detail">
+            <div class="user">
+                <img class="small-profile-picture" src="{{ com_post.author.profile_picture.url }}" alt="">
+                <a href="{% url 'users:profile' com_post.author.id %}"><h4>{{ com_post.author }}</h4></a>
+            </div>
+            <h4>{{ com_postp.title }}</h4>
+            {% if com_post.file %}
+                {% if com_post.file.url|slice:"-4:" == ".mp4" %}
+                    <video class="{{ com_post.id }}" loop="loop" style="height:300px; width:100%" controls="controls" muted>
+                        <source src="{{ com_post.file.url }}" type="video/mp4" /> 
+                    </video>
+                {% else %}
+                    <img style="height:100%; width:100%"src="{{ com_post.file.url }}" alt="">
+                {% endif %}
+            {% endif %}
+            {% if C.text %}
+                <p>{{ com_post.text | truncatechars:250}}</p>
+            {% endif %}
+            <p>{{ com_post.created_at }}</p>
+            <div class="like-com">
+                {% if request.user in com_post.likes.all %}
+                    <form method="post" action="{% url 'posts:delete_like' %}">
+                        {% csrf_token %}
+                        <input name="post" type="hidden" value="{{ com_post.id }}">
+                        <button style="border:none; background:none;padding: unset" type="submit"><i style="color:red" class="bi bi-heart-fill"></i></button>{{ p.likes.all.count }}
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'posts:like' %}">
+                        {% csrf_token %}
+                        <input name="post" type="hidden" value="{{ com_post.id }}">
+                        <button style="border:none; background:none;padding: unset" type="submit"><i class="bi bi-heart"></i></button>{{ p.likes.all.count }}
+                        </form>
+                {% endif %}
+            </div> 
+        </div>
+        <div class="comments">
+            <h4>Коментарии</h4>
+            <div class="comments-text">
+            {% for comment in comments %}
+                <p><b>{{ comment.user }}:</b> {{ comment.comment }} <a href="{% url 'landing_page' %}?comments={{ com_post.id }}&delete_comm={{ comment.id }}"><i class="bi bi-trash"></i></a> | <a href="{% url 'landing_page' %}?comments={{ com_post.id }}&update_comm={{ comment.id }}"><i class="bi bi-pen"></i></a></p>
+            {% endfor %}
+        </div>
+            <div class="comments-form">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form | crispy }}
+                <input type="hidden" name="post_id" value="{{ com_post.id }}">
+                <button class="btn btn-success" type="submit">Отправить</button>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+{% if del_com %}
+    <div class="delete_post_comment">
+        <h4>Вы точно хотите удалить коментарий ?</h4>
+        <a class="btn btn-outline-primary" href="/?comments={{ com_post.id }}">Нет</a> | 
+        <form class="delete_post_comm_form" action="{% url 'posts:delete_com' %}" method="post">{% csrf_token %}
+            <input type="hidden" value="{{ del_com }}" name="com_id">
+            <button class="btn btn-outline-danger" type="submit">Да</button>
+        </form>
+    </div>
+{% endif %}
+
+{% endif %}
 {% endblock %}
+{% comment %} <div class="comments">
+    {% if comments %}
+        {% for c in comments %}
+            <div class="comment ">
+                <b>{{ c.user }}:</b>
+                {{ c.comment }}
+            </div>
+        {% endfor %}
+    <a href="#">Все коментарии...</a>  
+    {% else %}
+        коментариев не найдено
+    {% endif %}
+</div> {% endcomment %}
+
+{% comment %} {% for p in posts %}
+<div class="card" style="width: 25rem;">
+    <h5 class="card-header">{{ p.title }}</h5>
+    {% if p.file.url|slice:"-4:" == ".mp4" %}
+        <video class="card-img-top" src="{{ p.file.url }}" controls></video>
+    {% else %}
+        <img src="{{ p.file.url }}" class="card-img-top" alt="...">
+    {% endif %}
+    <div class="card-body">
+        <p class="card-text">{{ p.text | truncatechars:140 }}</p>
+    </div>
+  </div>
+{% endfor %} {% endcomment %}

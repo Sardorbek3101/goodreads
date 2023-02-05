@@ -120,14 +120,22 @@ class FriendsChatView(View):
             change = request.GET.get("change", "")
             delete = request.GET.get("delete", "")
             if change:
-                msg = FriendChat.objects.get(id=change)
+                try:
+                    msg = FriendChat.objects.get(id=change)
+                except:
+                    messages.warning(request, "По вашему запросу не найдено сообщений !")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
                 if msg.user == request.user:
                     friend_chat_form = FriendChatForm(instance=msg)
                 else:
                     messages.warning(request, "Вам не разрешено изменить сообшения других пользователей!")
                     return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
             elif delete:
-                msg = FriendChat.objects.get(id=delete)
+                try:
+                    msg = FriendChat.objects.get(id=delete)
+                except:
+                    messages.warning(request, "По вашему запросу не найдено сообщений !")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
                 if msg.user == request.user:
                     friend_chat_form = msg
                 else:
@@ -158,7 +166,11 @@ class FriendsChatView(View):
             else:
                 file = ''
             if change:
-                msg = FriendChat.objects.get(id=change)
+                try:
+                    msg = FriendChat.objects.get(id=change)
+                except:
+                    messages.warning(request, "По вашему запросу не найдено сообщений !")
+                    return redirect(reverse("friends:friends_chat", kwargs={"id":id}))
                 if msg.user == request.user:
                     friend_chat_form = FriendChatForm(instance=msg, data=request.POST, files=request.FILES)
                     if friend_chat_form.is_valid():

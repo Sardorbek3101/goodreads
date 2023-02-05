@@ -37,7 +37,11 @@ class BooksView(View):
 class BookDetailView(View):
     def get(self, request, id):
         review_form = BookReviewForm()
-        book = Book.objects.get(id=id)
+        try:
+            book = Book.objects.get(id=id)
+        except:
+            messages.warning(request, "По вашему запросу книг не найдено !")
+            return redirect("books:list")
         return render(request, "books/detail.html", {"book": book, "review_form": review_form})
 
 

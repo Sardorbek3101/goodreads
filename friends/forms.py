@@ -1,5 +1,5 @@
 from django import forms
-from emoji_picker.widgets import EmojiPickerTextareaAdmin, EmojiPickerTextInputAdmin
+from emoji_picker.widgets import EmojiPickerTextareaAdmin
 from friends.models import FriendChat
 
 
