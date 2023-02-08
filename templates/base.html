@@ -40,7 +40,7 @@
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item {% if request.path == profile_page_url %}active{% endif %}" href="{% url 'users:profile' request.user.id %}">Профиль</a></li>
                             <li><a class="dropdown-item {% if request.path == friends_urls %}active{% endif %}" href="{% url 'friends:friends' %}">Друзья</a></li>
-                            <li><a class="dropdown-item position-relative {% if request.path == friends_requests_url %}active{% endif %}" href="{% url 'friends:friends_requests' %}">Запросы на дружбу
+                            <li><a class="dropdown-item position-relative {% if request.path == friends_requests_url %}active{% endif %}" href="{% url 'friends:friends_requests' %}">Уведомления
                                 {% if request.user.friendship_requests_to.all.count > 0 %}
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 {{ request.user.friendship_requests_to.all.count }}

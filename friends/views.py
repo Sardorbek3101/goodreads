@@ -42,6 +42,27 @@ class CreateFriendshipRequestView(View):
 
         return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
     
+
+class UnsubscribeFriendshipRequestView(LoginRequiredMixin, View):
+    def get(self, request, id):
+        try:
+            user = CustomUser.objects.get(id=id)
+            try:
+                friend_req = FriendshipRequest.objects.get(from_user=request.user, to_user=user)
+            except:
+                messages.warning(request, "По вашему запросу подписки не найдено !")
+                return redirect(reverse("users:profile", kwargs={"id":user.id}))
+        except:
+            messages.warning(request, "Такого пользователя не существует !")
+            return redirect(reverse("users:profile", kwargs={"id":request.user.id}))
+        if friend_req.from_user == request.user:
+            friend_req.delete()
+            return redirect(reverse("users:profile", kwargs={"id":friend_req.to_user.id}))
+        else:
+            messages.warning(request, "Вам не разрешено отменять чужие подписки !")
+            return redirect(reverse("users:profile", kwargs={"id":request.user.id}))
+
+
 class DontFriendshipView(LoginRequiredMixin ,View):
     def get(self, request, id):
         from_user = CustomUser.objects.get(id=id)
@@ -98,12 +119,12 @@ class DeleteFriendshipView(View):
         for t in request.user.friends_to.all():
             if t.from_user == user:
                 t.delete()
+                FriendshipRequest.objects.create(to_user = request.user, from_user = user)
         for t in request.user.friends_from.all():
             if t.to_user == user:
                 t.delete()
-
-        messages.success(request, "Удаление завершено успешно !")
-        return redirect("home_page")
+                FriendshipRequest.objects.create(to_user = request.user, from_user = user)
+        return redirect(reverse("users:profile", kwargs={"id":user.id}))
     
 
 class FriendsChatView(View):

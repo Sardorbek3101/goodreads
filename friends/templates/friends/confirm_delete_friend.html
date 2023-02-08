@@ -4,6 +4,6 @@
 
 <h3>Вы точно хотите удалить {{ user.username }} из друзей ?</h3>
 
-<a href="{% url 'users:profile' user.id %}">Нет</a> | <a href="{% url 'friends:delete_friend' user.id %}">Да</a>
+<a class="btn btn-outline-primary" href="{% url 'users:profile' user.id %}">Нет</a> | <a class="btn btn-outline-danger" href="{% url 'friends:delete_friend' user.id %}">Да</a>
 
 {% endblock content %}

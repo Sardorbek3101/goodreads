@@ -21,12 +21,18 @@ class PostsView(View):
             except:
                 messages.warning(request, "По вашему запросу не найдено комметарий !")
                 return redirect('landing_page')
+            if not comm.user == request.user:
+                messages.warning(request, "Вам не разрешено изменять чужие сообщения !")
+                return redirect('landing_page')
         del_com = request.GET.get("delete_comm", 0)
         if del_com:
             try:
                 comm = PostComments.objects.get(id=del_com)
             except:
                 messages.warning(request, "По вашему запросу не найдено комметарий !")
+                return redirect('landing_page')
+            if not comm.user == request.user:
+                messages.warning(request, "Вам не разрешено удалять чужие сообщения !")
                 return redirect('landing_page')
         post_id = request.GET.get("comments", "")
         if post_id:
@@ -35,14 +41,7 @@ class PostsView(View):
         return render(request, "landing.html", {"posts": posts, "comments":comment, "com_post":post, "form":com_form, "del_com":int(del_com)})
     
     def post(self, request):
-        form = PostCommentsForm(data=request.POST)
-        try:
-            post = Posts.objects.get(id=request.POST['post_id'])
-        except:
-            messages.warning(request, "По вашему запросу не найдено постов !")
-            return redirect('landing_page')
         update_com_id = request.GET.get("update_comm", "")
-
         if request.user.is_authenticated:
             if update_com_id:
                 try:
@@ -51,7 +50,7 @@ class PostsView(View):
                 except:
                     messages.warning(request, "По вашему запросу не найдено комметарий !")
                     return redirect('landing_page')
-                if com_form:
+                if post_com.user == request.user:
                     if com_form.is_valid():
                         com_form.save()
                         messages.success(request, "Изменения внесены успешно !")
@@ -59,6 +58,20 @@ class PostsView(View):
                     else:
                         messages.warning(request, "Произошла ошибка")
                         return redirect("landing_page")
+                else:
+                    messages.warning(request, "Вам не разрешено изменять чужие сооющения !")
+                    return redirect('landing_page')
+            form = PostCommentsForm(data=request.POST)
+            post_id = request.GET.get("comments", "")
+            if post_id:
+                try:
+                    post = Posts.objects.get(id=post_id)
+                except:
+                    messages.warning(request, "По вашему запросу не найдено постов !")
+                    return redirect('landing_page')
+            else:
+                messages.warning(request, "По вашему запросу не найдено постов !")
+                return redirect('landing_page')
             if form.is_valid():
                 PostComments.objects.create(user=request.user, comment=form.cleaned_data['comment'], post=post)
                 messages.success(request, "Комментарий успешно отправлен")

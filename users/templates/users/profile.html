@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Profile Page{% endblock %}
 {% block content %}
-
+{% comment %} 
 <div class="image d-flex flex-column justify-content-center align-items-center">
     <button class="btn btn-secondary">
         <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="Profile Picture">
@@ -30,6 +30,44 @@
             {% endif %}     
         {% endif %}
     {% endif %}
+</div> {% endcomment %}
+
+<div class="profile-containner">
+    <div class="profile-image"><img class="profile-picture" src="{{ user.profile_picture.url }}" alt=""></div>
+    <div class="profile-inf">
+    <h3>{{ user.username }}</h3>
+    <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+    <h6>{{ user.email }}</h6>
+    </div>
+    <div class="profile-users">
+        <a>Подписчики: <span>{{ sub.subscribers }}</span></a>
+        <a>Подписки: <span>{{ sub.subscriptions }}</span></a>
+    </div>
+    <div class="profile-active">
+    {% if request.user == user %}
+        <a class="btn btn-dark" href="{% url 'users:profile-edit' user.id %}">Edit Profile</a>
+        {% comment %} <span>Joined {{ user.date_joined | date:"M d, Y" }}</span> {% endcomment %}
+    {% else %}
+        {% if request.user.is_authenticated %}
+            {% if response == 'friends' %}
+            <div class="dropdown">
+                <a href="{% url 'friends:friends_chat' friends.id %}" class="btn btn-dark">Написать</a>
+                <i class="btn btn-dark dropdown-toggle bi bi-person-check" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'friends:delete_friend' user.id %}">Отписаться</a></li>
+                </ul>
+              </div>
+            {% elif response == 'request' %}
+                <a href="{% url 'friends:unsubscribe_request' user.id %}" class="btn btn-dark">Отписаться</a>
+            {% elif response == 'to_request' %}
+                <a href="{% url 'friends:confirm_friendship' user.id %}" class="btn btn-dark">Подписаться в ответ</a>
+            {% else %} 
+                <a class="btn btn-dark" href="{% url 'friends:create_friendship' user.id %}">Подписаться</a>
+            {% endif %}     
+        {% endif %}
+    {% endif %}
+</div>
+
 </div>
 
 {% endblock %}

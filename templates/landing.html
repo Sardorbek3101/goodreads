@@ -107,15 +107,14 @@
             <h4>Коментарии</h4>
             <div class="comments-text">
             {% for comment in comments %}
-                <p><b>{{ comment.user }}:</b> {{ comment.comment }} <a href="{% url 'landing_page' %}?comments={{ com_post.id }}&delete_comm={{ comment.id }}"><i class="bi bi-trash"></i></a> | <a href="{% url 'landing_page' %}?comments={{ com_post.id }}&update_comm={{ comment.id }}"><i class="bi bi-pen"></i></a></p>
+                <p><a href="{% url 'users:profile' comment.user.id %}"><b>{{ comment.user }}:</b></a> {{ comment.comment }} {% if request.user == comment.user %} <a href="{% url 'landing_page' %}?comments={{ com_post.id }}&delete_comm={{ comment.id }}"><i class="bi bi-trash"></i></a> | <a href="{% url 'landing_page' %}?comments={{ com_post.id }}&update_comm={{ comment.id }}"><i class="bi bi-pen"></i></a>{% endif %}</p>
             {% endfor %}
         </div>
-            <div class="comments-form">
+            <div class="comments-form"> 
             <form method="post">
                 {% csrf_token %}
                 {{ form.media }}
                 {{ form | crispy }}
-                <input type="hidden" name="post_id" value="{{ com_post.id }}">
                 <button class="btn btn-success" type="submit">Отправить</button>
             </form>
         </div>

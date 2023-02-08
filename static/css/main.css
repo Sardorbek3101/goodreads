@@ -1,6 +1,6 @@
 .profile-picture{
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
 }
 .small-profile-picture{
@@ -12,7 +12,28 @@
     width: 220px;
     height: 300px;
 }
+.profile-containner {
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+    padding: 20px 0;
+    border: solid 1px;
+    border-radius: 20px;
+    border-top: none;
+}
+.profile-users {
+    display: flex;
+    font-weight: 600;
+    font-size: 17px;
+}
 
+.profile-users a {
+    margin: 20px;
+    text-align: center;
+}
+.profile-users a span {
+    display: block;
+}
 .posts-content{
     margin-top:20px;
 }
@@ -219,6 +240,10 @@ nav{
     border-left: solid 1px;
     overflow: auto;
 }
+.comments-text a {
+    color: black;
+    text-decoration: none;
+}
 
 a.window-link {
     color: white;
@@ -268,4 +293,12 @@ a.window-link {
 }
 form.delete_post_comm_form {
     display: inline;
+}
+a.btn.btn-danger.pull-right {
+    font-size: 12px;
+    width: 49%;
+}
+a.btn.btn-primary.pull-right {
+    font-size: 12px;
+    width: 49%;
 }

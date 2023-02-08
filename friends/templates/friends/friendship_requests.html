@@ -19,8 +19,8 @@
                     <p>{{ f_request.from_user.first_name }} {{ f_request.from_user.last_name }}</p>
                   </div>
                   <div style="width: 30%" class="col-md-3 col-sm-3">
-                    <a class="btn btn-danger pull-right" href="{% url 'friends:delete_request' f_request.from_user.id %}">Отклонить</a>
-                    <a class="btn btn-primary pull-right" href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подвердить</a>
+                    <a class="btn btn-danger pull-right" href="{% url 'friends:delete_request' f_request.from_user.id %}">Удалить из подписчиков</a>
+                    <a class="btn btn-primary pull-right" href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подписаться в ответ</a>
                   </div>
                 </div>
               </div>
