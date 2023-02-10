@@ -9,6 +9,7 @@ class FriendshipRequest(models.Model):
     to_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="friendship_requests_to")
     from_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="friendship_requests_from")
     created_at = models.DateTimeField(default=timezone.now)
+    view = models.BooleanField(default=False)
 
     def __str__(self):
         return f"ОТ {self.from_user.username} К {self.to_user.username}"

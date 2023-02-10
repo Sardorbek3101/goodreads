@@ -41,11 +41,28 @@
                             <li><a class="dropdown-item {% if request.path == profile_page_url %}active{% endif %}" href="{% url 'users:profile' request.user.id %}">Профиль</a></li>
                             <li><a class="dropdown-item {% if request.path == friends_urls %}active{% endif %}" href="{% url 'friends:friends' %}">Друзья</a></li>
                             <li><a class="dropdown-item position-relative {% if request.path == friends_requests_url %}active{% endif %}" href="{% url 'friends:friends_requests' %}">Уведомления
-                                {% if request.user.friendship_requests_to.all.count > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ request.user.friendship_requests_to.all.count }}
-                                <span class="visually-hidden">unread messages</span></span>
+                                <span id="msg" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"><span id="message_count"></span>
+                                    <span class="visually-hidden">unread messages</span></span>
+                                {% for obj in request.user.friendship_requests_to.all %}
+                                {% if obj.view == False %}
+                                    
+                                    <script>
+                                        var count = document.getElementById("message_count").innerHTML
+                                        if (count == ""){
+                                            count = 0
+                                        }
+                                        num = parseInt(count) + 1
+                                        document.getElementById("message_count").textContent = num
+                                    </script>
                                 {% endif %}
+                                {% endfor %}
+                                <script>
+                                    var count = document.getElementById("message_count").innerHTML
+                                    var msg = document.getElementById("msg")
+                                    if (count == ""){
+                                        msg.style.display = "none"
+                                    }
+                                </script>
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>

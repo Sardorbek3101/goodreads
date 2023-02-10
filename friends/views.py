@@ -6,10 +6,16 @@ from friends.models import FriendChat, Friendship, FriendshipRequest
 from django.contrib.auth.mixins import LoginRequiredMixin
 from users.models import CustomUser
 from friends.forms import FriendChatForm
+from django.utils import timezone
 
 
 class FriendshipRequestView(LoginRequiredMixin, View):
     def get(self, request):
+        for u in request.user.friendship_requests_to.all():
+            if u.view == False:
+                if timezone.now() >= u.created_at:
+                    u.view = True
+                    u.save()
         return render(request, 'friends/friendship_requests.html', {"user":request.user})
 
 class CreateFriendshipRequestView(View):
@@ -88,14 +94,9 @@ class ConfirmFriendshipView(View):
                     messages.warning(request, "Вы уже друзья !")
                     return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
                 
-            for to in request.user.friendship_requests_to.all():
-                if to.from_user == from_user:
-                    for t in request.user.friendship_requests_to.all():
-                        if t.from_user == from_user:
-                            t.delete()
-                    for t in request.user.friendship_requests_from.all():
-                        if t.to_user == from_user:
-                            t.delete()
+            for t in request.user.friendship_requests_to.all():
+                if t.from_user == from_user:
+                    t.delete()
                     Friendship.objects.create(from_user=from_user, to_user=request.user)
                     messages.success(request, f"Пользователь {from_user.username} теперь ваш друг !")
                     return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
@@ -119,11 +120,11 @@ class DeleteFriendshipView(View):
         for t in request.user.friends_to.all():
             if t.from_user == user:
                 t.delete()
-                FriendshipRequest.objects.create(to_user = request.user, from_user = user)
+                FriendshipRequest.objects.create(to_user = request.user, from_user = user, view = True)
         for t in request.user.friends_from.all():
             if t.to_user == user:
                 t.delete()
-                FriendshipRequest.objects.create(to_user = request.user, from_user = user)
+                FriendshipRequest.objects.create(to_user = request.user, from_user = user, view = True)
         return redirect(reverse("users:profile", kwargs={"id":user.id}))
     
 
