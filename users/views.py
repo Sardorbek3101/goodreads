@@ -51,8 +51,8 @@ class ProfileView(View):
         user = CustomUser.objects.get(id=id)
         response = ''
         friends = None
-        subscribers = user.friends_to.all().count() + user.friends_from.all().count() + user.friendship_requests_to.all().count()
-        subscriptions = user.friends_to.all().count() + user.friends_from.all().count() + user.friendship_requests_from.all().count()
+        subscribers = user.friendship_requests_to.all().count()
+        subscriptions = user.friendship_requests_from.all().count()
         sub = {'subscribers': subscribers, 'subscriptions':subscriptions}
         for to in request.user.friendship_requests_from.all():
             if to.to_user == user:

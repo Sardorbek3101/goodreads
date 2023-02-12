@@ -74,6 +74,12 @@ class DontFriendshipView(LoginRequiredMixin ,View):
         from_user = CustomUser.objects.get(id=id)
         for n in request.user.friendship_requests_to.all():
             if n.from_user == from_user:
+                for f in request.user.friends_to.all():
+                    if f.from_user == from_user:
+                        f.delete()
+                for f in request.user.friends_from.all():
+                    if f.to_user == from_user:
+                        f.delete()
                 n.delete()
                 return redirect("home_page")
             else:
@@ -96,7 +102,7 @@ class ConfirmFriendshipView(View):
                 
             for t in request.user.friendship_requests_to.all():
                 if t.from_user == from_user:
-                    t.delete()
+                    FriendshipRequest.objects.create(from_user = request.user, to_user = from_user)
                     Friendship.objects.create(from_user=from_user, to_user=request.user)
                     messages.success(request, f"Пользователь {from_user.username} теперь ваш друг !")
                     return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
@@ -117,14 +123,18 @@ class ConfirmDeleteFriendshipView(View):
 class DeleteFriendshipView(View):
     def get(self, request, id):
         user = CustomUser.objects.get(id=id)
+        try:
+            fr_req = FriendshipRequest.objects.get(from_user=request.user, to_user=user)
+            fr_req.delete()
+        except:
+            messages.warning(request, "Подписки не найдено")
+            return redirect(reverse("users:profile", kwargs={"id":user.id}))
         for t in request.user.friends_to.all():
             if t.from_user == user:
                 t.delete()
-                FriendshipRequest.objects.create(to_user = request.user, from_user = user, view = True)
         for t in request.user.friends_from.all():
             if t.to_user == user:
                 t.delete()
-                FriendshipRequest.objects.create(to_user = request.user, from_user = user, view = True)
         return redirect(reverse("users:profile", kwargs={"id":user.id}))
     
 

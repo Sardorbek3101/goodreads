@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h4>Запросы на дружбу</h4>
+<h4>Уведомления</h4>
 {% if user.friendship_requests_to.all %}
 {% for f_request in user.friendship_requests_to.all %}
 <div class="container">
@@ -16,11 +16,25 @@
                   </div>
                   <div style="width: 53.333333%" class="col-md-7 col-sm-7">
                     <h5><a href="{% url 'users:profile' f_request.from_user.id %}" class="profile-link">{{ f_request.from_user }}</a></h5>
-                    <p>{{ f_request.from_user.first_name }} {{ f_request.from_user.last_name }}</p>
+                    <p>{{ f_request.from_user.first_name }} {{ f_request.from_user.last_name }}<br><span style="font-size:14px">Подписался(лась) на вас</span></p>
+                    
                   </div>
-                  <div style="width: 30%" class="col-md-3 col-sm-3">
-                    <a class="btn btn-danger pull-right" href="{% url 'friends:delete_request' f_request.from_user.id %}">Удалить из подписчиков</a>
-                    <a class="btn btn-primary pull-right" href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подписаться в ответ</a>
+                  <div style="width: 30%; margin:auto" class="col-md-3 col-sm-3">
+                    {% for friend in request.user.friends_to.all %}
+                      {% if friend.from_user == f_request.from_user %}
+                      <a class="btn btn-danger pull-right no-style" href="{% url 'friends:delete_friend' f_request.from_user.id %}">Отписаться</a> <span style="display:none" id="friend">True</span>
+                      {% endif %}
+                    {% endfor %}
+                    {% for friend in request.user.friends_from.all %}
+                      {% if friend.to_user == f_request.from_user %}
+                        Вы Друзья <span style="display:none" id="friend">True</span>
+                      {% endif %}
+                    {% endfor %}
+                      
+                    <div id="friend-req-none">
+                      <a class="btn btn-danger pull-right" href="{% url 'friends:delete_request' f_request.from_user.id %}">Удалить из подписчиков</a>
+                      <a class="btn btn-primary pull-right" href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подписаться в ответ</a>
+                  </div>
                   </div>
                 </div>
               </div>
@@ -28,7 +42,13 @@
     	</div>
 	</div>
 </div>
-
+<script>
+  let friend = document.getElementById("friend").innerHTML
+  if (friend == "True") {
+    friendreqnone = document.getElementById("friend-req-none")
+    friendreqnone.style.display = "none"
+  }
+</script>
 {% endfor %}
 {% else %}
 Запросов не найдено
