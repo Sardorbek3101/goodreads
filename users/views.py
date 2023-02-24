@@ -51,6 +51,7 @@ class ProfileView(View):
         user = CustomUser.objects.get(id=id)
         response = ''
         friends = None
+        subscriptions_req = request.GET.get("user", "")
         subscribers = user.friendship_requests_to.all().count()
         subscriptions = user.friendship_requests_from.all().count()
         sub = {'subscribers': subscribers, 'subscriptions':subscriptions}
@@ -70,7 +71,7 @@ class ProfileView(View):
                     response = 'friends'
                     friends = n
 
-        return render(request, "users/profile.html", {"user": user, "response":response, "friends":friends, "sub":sub})
+        return render(request, "users/profile.html", {"user": user, "response":response, "friends":friends, "sub":sub, "user_sub_req":subscriptions_req})
 
 
 class LogoutView(LoginRequiredMixin,View):

@@ -30,6 +30,8 @@
 .profile-users a {
     margin: 20px;
     text-align: center;
+    text-decoration: none;
+    color: black;
 }
 .profile-users a span {
     display: block;
@@ -334,5 +336,31 @@ a.btn.pull-right.no-style{
 }
 .profile-post img {
     width: 100%;
+}
+.profile-black-box {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #000000d9;
+}
+a.sub_exit {
+    position: fixed;
+    top: 12%;
+    color: white;
+    right: 25%;
+    font-size: 40px;
+}
+.user_subs {
+    width: 30%;
+    /* color: beige; */
+    position: relative;
+    padding: 10px 10px;
+    height: 40%;
+    left: 35%;
+    border-radius: 20px;
+    top: 25%;
+    background-color: white;
 }
 

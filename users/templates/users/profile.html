@@ -40,8 +40,8 @@
     <h6>{{ user.email }}</h6>
     </div>
     <div class="profile-users">
-        <a>Подписчики: <span>{{ sub.subscribers }}</span></a>
-        <a>Подписки: <span>{{ sub.subscriptions }}</span></a>
+        <a href="{% url 'users:profile' user.id %}?user=subscribers">Подписчики: <span>{{ sub.subscribers }}</span></a>
+        <a href="{% url 'users:profile' user.id %}?user=subscriptions">Подписки: <span>{{ sub.subscriptions }}</span></a>
     </div>
     <div class="profile-active">
     {% if request.user == user %}
@@ -129,4 +129,29 @@
     {% endif %}
     {% endfor %}
 </div>
+
+{% if user_sub_req %}
+<div class="profile-black-box">
+<a class="sub_exit" href="{% url 'users:profile' user.id %}"><i class="bi bi-x"></i></a>
+<div class="user_subs">
+    {% if user_sub_req == "subscribers" %}
+        <h4>Подписчики</h4>
+        {% for user_sub in user.friendship_requests_to.all %}
+        <div class="subscriber">
+            {{ user_sub.from_user.username }}
+        </div>
+        {% endfor %}
+    {% elif user_sub_req == "subscriptions" %}
+        <h4>Подписки</h4>
+        {% for user_sub in user.friendship_requests_from.all %}
+        <div class="subscription">
+            {{ user_sub.to_user.username }}
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+</div>
+{% endif %}
+
+
 {% endblock %}
