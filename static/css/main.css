@@ -232,6 +232,7 @@ nav{
     border: none;
     margin: auto;
     overflow: auto;
+    max-height: 100%;
 }
 .comments {
     width: 50%;
@@ -306,3 +307,32 @@ a.btn.pull-right.no-style{
     font-size: 16px;
     width: auto;
 }
+.profile-posts-link {
+    text-align: center;
+}
+.profile-posts-link a {
+    font-size: 30px;
+    color: black;
+    /* border: solid 1px; */
+    /* padding: 0px 21px; */
+}
+.profile-posts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+}
+.profile-post {
+    width: 40%;
+    background-color: aliceblue;
+    padding: 10px 35px;
+    /* margin: 0 60px 40px; */
+    border-radius: 25px;
+    text-align: center;
+    margin-bottom: 50px;
+    /* display: inline-block; */
+}
+.profile-post img {
+    width: 100%;
+}
+

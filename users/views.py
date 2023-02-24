@@ -54,20 +54,21 @@ class ProfileView(View):
         subscribers = user.friendship_requests_to.all().count()
         subscriptions = user.friendship_requests_from.all().count()
         sub = {'subscribers': subscribers, 'subscriptions':subscriptions}
-        for to in request.user.friendship_requests_from.all():
-            if to.to_user == user:
-                response = 'request'
-        for frm in request.user.friendship_requests_to.all():
-            if frm.from_user == user:
-                response = 'to_request'
-        for n in request.user.friends_to.all():
-            if n.from_user == user:
-                response = 'friends'
-                friends = n
-        for n in request.user.friends_from.all():
-            if n.to_user == user:
-                response = 'friends'
-                friends = n
+        if request.user.is_authenticated:
+            for to in request.user.friendship_requests_from.all():
+                if to.to_user == user:
+                    response = 'request'
+            for frm in request.user.friendship_requests_to.all():
+                if frm.from_user == user:
+                    response = 'to_request'
+            for n in request.user.friends_to.all():
+                if n.from_user == user:
+                    response = 'friends'
+                    friends = n
+            for n in request.user.friends_from.all():
+                if n.to_user == user:
+                    response = 'friends'
+                    friends = n
 
         return render(request, "users/profile.html", {"user": user, "response":response, "friends":friends, "sub":sub})
 
