@@ -20,20 +20,15 @@
                     
                   </div>
                   <div style="width: 30%; margin:auto" class="col-md-3 col-sm-3">
-                    {% for friend in request.user.friends_to.all %}
-                      {% if friend.from_user == f_request.from_user %}
-                      <a class="btn btn-danger pull-right no-style" href="{% url 'friends:delete_friend' f_request.from_user.id %}">Отписаться</a> <span style="display:none" id="friend{{ f_request.id }}">True</span>
-                      {% endif %}
-                    {% endfor %}
-                    {% for friend in request.user.friends_from.all %}
-                      {% if friend.to_user == f_request.from_user %}
-                      <a class="btn btn-danger pull-right no-style" href="{% url 'friends:delete_friend' f_request.from_user.id %}">Отписаться</a> <span style="display:none" id="friend{{ f_request.id }}">True</span>
+                    {% for req in request.user.friendship_requests_from.all %}
+                      {% if req.to_user == f_request.from_user %}
+                        <form action="{% url 'friends:delete_friend' f_request.from_user.id %}" method="post">{% csrf_token %}<input type="hidden" name="req" value="{{ request.path }}"><button class="btn btn-danger pull-right no-style" type="submit">Отписаться</button></form> <span style="display:none" id="friend{{ f_request.id }}">True</span>
                       {% endif %}
                     {% endfor %}
                       
                     <div id="friend-req-none{{ f_request.id }}">
                       <a class="btn btn-danger pull-right" href="{% url 'friends:delete_request' f_request.from_user.id %}">Удалить из подписчиков</a>
-                      <a class="btn btn-primary pull-right" href="{% url 'friends:confirm_friendship' f_request.from_user.id %}">Подписаться в ответ</a>
+                      <a class="btn btn-primary pull-right" href="{% url 'friends:create_friendship' f_request.from_user.id %}">Подписаться в ответ</a>
                   </div>
                   <script>
                     var friend = document.getElementById("friend{{ f_request.id }}").innerHTML

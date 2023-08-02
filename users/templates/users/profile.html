@@ -1,36 +1,7 @@
 {% extends 'base.html' %}
+{% comment %} {% load dinotags %} {% endcomment %}
 {% block title %}Profile Page{% endblock %}
 {% block content %}
-{% comment %} 
-<div class="image d-flex flex-column justify-content-center align-items-center">
-    <button class="btn btn-secondary">
-        <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="Profile Picture">
-    </button>
-    <span class="name mt-3">{{ user.first_name }} {{ user.last_name }}</span>
-    <span class="idd">@{{ user.username }}</span>
-    <span class="idd">{{ user.email }}</span>
-    {% if request.user == user %}
-        <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'users:profile-edit' user.id %}">Edit Profile</a></div>
-        <div class=" px-2 rounded mt-4 date "><span class="join">Joined {{ user.date_joined | date:"M d, Y" }}</span></div>
-    {% else %}
-        {% if request.user.is_authenticated %}
-            {% if response == 'friends' %}
-            <br>
-            <div class="dropdown">
-                <a href="{% url 'friends:friends_chat' friends.id %}" class="btn btn-dark">Написать</a>
-                <i class="btn btn-dark dropdown-toggle bi bi-person-check" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'friends:conf_del_friend' user.id %}">Удалить друга</a></li>
-                </ul>
-              </div>
-            {% elif response == 'request' %}
-                <div class="btn btn-dark d-flex mt-2">Заявка на дружбу отправлена</div>
-            {% else %} 
-                <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'friends:create_friendship' user.id %}">Добавить в друзья</a></div>
-            {% endif %}     
-        {% endif %}
-    {% endif %}
-</div> {% endcomment %}
 
 <div class="profile-containner">
     <div class="profile-image"><img class="profile-picture" src="{{ user.profile_picture.url }}" alt=""></div>
@@ -54,13 +25,13 @@
                 <a href="{% url 'friends:friends_chat' friends.id %}" class="btn btn-dark">Написать</a>
                 <i class="btn btn-dark dropdown-toggle bi bi-person-check" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'friends:delete_friend' user.id %}">Отписаться</a></li>
+                  <li><form style="display: inline;" action="{% url 'friends:delete_friend' user.id %}" method="post">{% csrf_token %}<input type="hidden" name="req" value="{{ request.path }}"><button class="dropdown-item btn btn-dark" style="border: none;background: none;color: royalblue;text-decoration: underline;" type="submit">Отписаться</button></form></li>
                 </ul>
               </div>
             {% elif response == 'request' %}
-                <a href="{% url 'friends:unsubscribe_request' user.id %}" class="btn btn-dark">Отписаться</a>
+                <form action="{% url 'friends:delete_friend' user.id %}" method="post">{% csrf_token %}<input type="hidden" name="req" value="{{ request.path }}"><button class="btn btn-dark" type="submit">Отписаться</button></form>
             {% elif response == 'to_request' %}
-                <a href="{% url 'friends:confirm_friendship' user.id %}" class="btn btn-dark">Подписаться в ответ</a>
+                <a href="{% url 'friends:create_friendship' user.id %}" class="btn btn-dark">Подписаться в ответ</a>
             {% else %} 
                 <a class="btn btn-dark" href="{% url 'friends:create_friendship' user.id %}">Подписаться</a>
             {% endif %}     
@@ -83,7 +54,7 @@
                     <source src="{{ post.file.url }}" type="video/mp4" /> 
                 </video>
             {% else %}
-                <img style="height:100%; width:100%"src="{{ post.file.url }}" alt="">
+                <img style="width:100%"src="{{ post.file.url }}" alt="">
             {% endif %}
         {% endif %}
             <p>{{ post.text }}</p>
@@ -138,14 +109,30 @@
         <h4>Подписчики</h4>
         {% for user_sub in user.friendship_requests_to.all %}
         <div class="subscriber">
-            {{ user_sub.from_user.username }}
+            <a href="{% url 'users:profile' user_sub.from_user.id %}">{{ user_sub.from_user.username }}</a> {% if user == request.user %} <a href="{% url 'friends:delete_request' user_sub.from_user.id %}">Удалить из подписчиков</a>
+            {% comment %} <a href="">{{ user_sub.from_user.id | check_podpiski }}</a> {% endcomment %}
+            {% for sub_friend in request.user.friendship_requests_from.all %}
+                {% if sub_friend.to_user == user_sub.from_user %}
+                    <i class="bi bi-person-check"></i> <span style="display:none" id="check_podpiski_{{ user_sub.id }}">True</span>
+                {% endif %}
+            {% endfor %}
+            <a id="pod_otvet_{{ user_sub.id }}" href="{% url 'friends:create_friendship' user_sub.from_user.id %}">Подписаться</a>
+            {% endif %}
         </div>
+        <script>
+            var sub_friend = document.getElementById("check_podpiski_{{ user_sub.id }}").innerHTML
+            console.log(sub_friend)
+            if (sub_friend == "True"){
+                friendreqnone = document.getElementById("pod_otvet_{{ user_sub.id }}")
+                friendreqnone.style.display = "none"
+            }
+        </script>
         {% endfor %}
     {% elif user_sub_req == "subscriptions" %}
         <h4>Подписки</h4>
         {% for user_sub in user.friendship_requests_from.all %}
         <div class="subscription">
-            {{ user_sub.to_user.username }}
+            <a href="{% url 'users:profile' user_sub.to_user.id %}">{{ user_sub.to_user.username }}</a>{% if request.user == user %} <form style="display: inline;" action="{% url 'friends:delete_friend' user_sub.to_user.id %}" method="post">{% csrf_token %}<input type="hidden" name="req" value="{{ request.path }}?user=subscriptions"><button style="border: none;background: none;color: royalblue;text-decoration: underline;" type="submit">Отписаться</button></form>{% endif %}
         </div>
         {% endfor %}
     {% endif %}
@@ -155,3 +142,42 @@
 
 
 {% endblock %}
+
+
+
+
+
+
+
+
+
+{% comment %} 
+<div class="image d-flex flex-column justify-content-center align-items-center">
+    <button class="btn btn-secondary">
+        <img class="profile-picture" src="{{ user.profile_picture.url }}" alt="Profile Picture">
+    </button>
+    <span class="name mt-3">{{ user.first_name }} {{ user.last_name }}</span>
+    <span class="idd">@{{ user.username }}</span>
+    <span class="idd">{{ user.email }}</span>
+    {% if request.user == user %}
+        <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'users:profile-edit' user.id %}">Edit Profile</a></div>
+        <div class=" px-2 rounded mt-4 date "><span class="join">Joined {{ user.date_joined | date:"M d, Y" }}</span></div>
+    {% else %}
+        {% if request.user.is_authenticated %}
+            {% if response == 'friends' %}
+            <br>
+            <div class="dropdown">
+                <a href="{% url 'friends:friends_chat' friends.id %}" class="btn btn-dark">Написать</a>
+                <i class="btn btn-dark dropdown-toggle bi bi-person-check" type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'friends:conf_del_friend' user.id %}">Удалить друга</a></li>
+                </ul>
+              </div>
+            {% elif response == 'request' %}
+                <div class="btn btn-dark d-flex mt-2">Заявка на дружбу отправлена</div>
+            {% else %} 
+                <div class=" d-flex mt-2"><a class="btn btn-dark" href="{% url 'friends:create_friendship' user.id %}">Добавить в друзья</a></div>
+            {% endif %}     
+        {% endif %}
+    {% endif %}
+</div> {% endcomment %}

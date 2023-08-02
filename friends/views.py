@@ -25,49 +25,27 @@ class CreateFriendshipRequestView(View):
             if request.user == to_user:
                 messages.warning(request, "Вы не можете предложить дружбу сам себе!")
                 return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
-            
-            for n in request.user.friends_to.all():
-                if n.from_user == to_user:
-                    messages.warning(request, "Вы уже друзья !")
-                    return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
-                
-            for n in request.user.friends_from.all():
-                if n.to_user == to_user:
-                    messages.warning(request, "Вы уже друзья !")
-                    return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
 
             for to in request.user.friendship_requests_from.all():
                 if to.to_user == to_user:
-                    messages.warning(request, "Предложение на дружбу уже отправлена ! Вы не можете предложить дружбу два раза !")
+                    messages.warning(request, "Вы уже подписаны на данного пользователя !")
                     return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
             else:
                 FriendshipRequest.objects.create(
                     from_user = request.user,
                     to_user = to_user
                 )
+                for pochki in request.user.friendship_requests_to.all():
+                    if pochki.from_user == to_user:
+                        Friendship.objects.create(
+                            from_user = to_user,
+                            to_user = request.user
+                        )
+                        Friendship.save
+                        messages.success(request, f"{to_user} теперь ваш друг !")
 
         return redirect(reverse("users:profile", kwargs={"id":to_user.id}))
     
-
-class UnsubscribeFriendshipRequestView(LoginRequiredMixin, View):
-    def get(self, request, id):
-        try:
-            user = CustomUser.objects.get(id=id)
-            try:
-                friend_req = FriendshipRequest.objects.get(from_user=request.user, to_user=user)
-            except:
-                messages.warning(request, "По вашему запросу подписки не найдено !")
-                return redirect(reverse("users:profile", kwargs={"id":user.id}))
-        except:
-            messages.warning(request, "Такого пользователя не существует !")
-            return redirect(reverse("users:profile", kwargs={"id":request.user.id}))
-        if friend_req.from_user == request.user:
-            friend_req.delete()
-            return redirect(reverse("users:profile", kwargs={"id":friend_req.to_user.id}))
-        else:
-            messages.warning(request, "Вам не разрешено отменять чужие подписки !")
-            return redirect(reverse("users:profile", kwargs={"id":request.user.id}))
-
 
 class DontFriendshipView(LoginRequiredMixin ,View):
     def get(self, request, id):
@@ -86,29 +64,6 @@ class DontFriendshipView(LoginRequiredMixin ,View):
                 messages.warning(request, f"Пользователь {from_user.username} не отправлял вам запрос на дружбу !")
                 return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
 
-class ConfirmFriendshipView(View):
-    def get(self, request, id):
-        from_user = CustomUser.objects.get(id=id)
-        if request.user.is_authenticated:
-            for n in request.user.friends_to.all():
-                if n.from_user == from_user:
-                    messages.warning(request, "Вы уже друзья !")
-                    return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
-                    
-            for n in request.user.friends_from.all():
-                if n.to_user == from_user:
-                    messages.warning(request, "Вы уже друзья !")
-                    return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
-                
-            for t in request.user.friendship_requests_to.all():
-                if t.from_user == from_user:
-                    FriendshipRequest.objects.create(from_user = request.user, to_user = from_user)
-                    Friendship.objects.create(from_user=from_user, to_user=request.user)
-                    messages.success(request, f"Пользователь {from_user.username} теперь ваш друг !")
-                    return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
-        messages.warning(request, f"Пользователь {from_user.username} не отправлял вам запрос на дружбу !")
-        return redirect(reverse("users:profile", kwargs={"id":from_user.id}))
-
 
 class FriendsView(LoginRequiredMixin, View):
     def get(self, request):
@@ -120,22 +75,26 @@ class ConfirmDeleteFriendshipView(View):
 
         return render(request, "friends/confirm_delete_friend.html", {"user":user})
 
-class DeleteFriendshipView(View):
-    def get(self, request, id):
-        user = CustomUser.objects.get(id=id)
+class DeleteFriendshipView(LoginRequiredMixin, View):
+    def post(self, request, id):
+        try:
+            user = CustomUser.objects.get(id=id)
+        except:
+            messages.warning(request, "Такого пользователя не существует !")
+            return redirect(request.POST['req'])
         try:
             fr_req = FriendshipRequest.objects.get(from_user=request.user, to_user=user)
             fr_req.delete()
         except:
             messages.warning(request, "Подписки не найдено")
-            return redirect(reverse("users:profile", kwargs={"id":user.id}))
+            return redirect(request.POST['req'])
         for t in request.user.friends_to.all():
             if t.from_user == user:
                 t.delete()
         for t in request.user.friends_from.all():
             if t.to_user == user:
                 t.delete()
-        return redirect(reverse("users:profile", kwargs={"id":user.id}))
+        return redirect(request.POST['req'])
     
 
 class FriendsChatView(View):
