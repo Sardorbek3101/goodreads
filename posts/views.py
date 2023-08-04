@@ -14,6 +14,7 @@ class PostsView(View):
         com_form = PostCommentsForm()
         posts = Posts.objects.all().order_by('-created_at')
         update_com_id = request.GET.get("update_comm", "")
+        come_back = request.GET.get("come_back", "")
         if update_com_id:
             try:
                 comm = PostComments.objects.get(id=update_com_id)
@@ -22,7 +23,7 @@ class PostsView(View):
                 messages.warning(request, "По вашему запросу не найдено комметарий !")
                 return redirect('landing_page')
             if not comm.user == request.user:
-                messages.warning(request, "Вам не разрешено изменять чужие сообщения !")
+                messages.warning(request, "Вам не разрешено изменять чужие комментарии !")
                 return redirect('landing_page')
         del_com = request.GET.get("delete_comm", 0)
         if del_com:
@@ -32,13 +33,17 @@ class PostsView(View):
                 messages.warning(request, "По вашему запросу не найдено комметарий !")
                 return redirect('landing_page')
             if not comm.user == request.user:
-                messages.warning(request, "Вам не разрешено удалять чужие сообщения !")
+                messages.warning(request, "Вам не разрешено удалять чужие комментарии !")
                 return redirect('landing_page')
         post_id = request.GET.get("comments", "")
         if post_id:
-            post = Posts.objects.get(id = post_id)
+            try:
+                post = Posts.objects.get(id = post_id)
+            except:
+                messages.warning(request, "По вашему запросу комментарии не найдены !")
+                return redirect("landing_page")
             comment = post.postcomments_set.all()
-        return render(request, "landing.html", {"posts": posts, "comments":comment, "com_post":post, "form":com_form, "del_com":int(del_com)})
+        return render(request, "landing.html", {"posts": posts, "comments":comment, "com_post":post, "form":com_form, "del_com":int(del_com), "come_back":come_back})
     
     def post(self, request):
         update_com_id = request.GET.get("update_comm", "")

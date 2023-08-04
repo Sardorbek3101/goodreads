@@ -47,7 +47,7 @@
 <div class="profile-posts">
     {% for post in user.posts_set.all %}
         {% if post.file %}
-        <div class="profile-post">
+        <div class="profile-post" id="profile-post-{{ post.id }}">
             <h3>{{ post.title }}</h3>
             <div class="frofile_post_file">
                 <div class="profile_post_file_containner">
@@ -78,7 +78,7 @@
                         <button style="border:none; background:none;padding: unset" type="submit"><i class="bi bi-heart"></i></button>{{ p.likes.all.count }}
                         </form>
                 {% endif %}
-                <a href="{% url 'landing_page' %}?comments={{ post.id }}">коментарии</a>
+                <a href="{% url 'landing_page' %}?comments={{ post.id }}&come_back={{ request.path }}">коментарии</a>
             </div>
         </div>
     {% endif %}

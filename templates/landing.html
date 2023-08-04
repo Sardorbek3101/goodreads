@@ -66,7 +66,12 @@
 </div>
 {% if com_post %}
 <div class="black-window">
-    <a class="window-link" href="{% url 'landing_page' %}#post-{{com_post.id}}"><i class="bi bi-x"></i></a>
+    {% if come_back %}
+        <a class="window-link" href="{{ come_back }}#profile-post-{{com_post.id}}"><i class="bi bi-x"></i></a>
+    {% else %}
+        <a class="window-link" href="{% url 'landing_page' %}#post-{{com_post.id}}"><i class="bi bi-x"></i></a>
+    {% endif %}
+    
     <div class="post-comments"> 
         <div class="post post-detail">
             <div class="user">
