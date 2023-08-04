@@ -3,8 +3,8 @@ from django.shortcuts import render
 from books.models import BookReview
 
 
-def landing_page(request):
-    return render(request, "landing.html")
+# def landing_page(request):
+#     return render(request, "landing.html")
 
 
 def home_page(request):

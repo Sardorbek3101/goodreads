@@ -46,17 +46,22 @@
 </div>
 <div class="profile-posts">
     {% for post in user.posts_set.all %}
+        {% if post.file %}
         <div class="profile-post">
             <h3>{{ post.title }}</h3>
-            {% if post.file %}
-            {% if post.file.url|slice:"-4:" == ".mp4" %}
-                <video class="{{ post.id }}" loop="loop" style="height:300px; width:100%" controls="controls" muted>
-                    <source src="{{ post.file.url }}" type="video/mp4" /> 
-                </video>
-            {% else %}
-                <img style="width:100%"src="{{ post.file.url }}" alt="">
-            {% endif %}
-        {% endif %}
+            <div class="frofile_post_file">
+                <div class="profile_post_file_containner">
+                    {% if post.file.url|slice:"-4:" == ".mp4" %}
+                        <a href="{% url 'landing_page' %}?comments={{ post.id }}"><i class="bi bi-play-circle-fill"></i>
+                            <video>
+                                <source src="{{ post.file.url }}" type="video/mp4" /> 
+                            </video>
+                        </a>
+                    {% else %}
+                        <img src="{{ post.file.url }}" alt="">
+                    {% endif %}
+                </div>
+            </div>
             <p>{{ post.text }}</p>
             <p>{{ post.created_at }}</p>
             <div class="like-com">
@@ -76,27 +81,6 @@
                 <a href="{% url 'landing_page' %}?comments={{ post.id }}">коментарии</a>
             </div>
         </div>
-        {% if post.file.url|slice:"-4:" == ".mp4" %}
-    <script>
-        // Plugin isInViewport
-    !function(e,n){"object"==typeof exports&&"undefined"!=typeof module?n(require("jquery"),require("window")):"function"==typeof define&&define.amd?define("isInViewport",["jquery","window"],n):n(e.$,e.window)}(this,function(e,n){"use strict";function t(n){var t=this;if(1===arguments.length&&"function"==typeof n&&(n=[n]),!(n instanceof Array))throw new SyntaxError("isInViewport: Argument(s) passed to .do/.run should be a function or an array of functions");return n.forEach(function(n){"function"!=typeof n?(console.warn("isInViewport: Argument(s) passed to .do/.run should be a function or an array of functions"),console.warn("isInViewport: Ignoring non-function values in array and moving on")):[].slice.call(t).forEach(function(t){return n.call(e(t))})}),this}function o(n){var t=e("<div></div>").css({width:"100%"});n.append(t);var o=n.width()-t.width();return t.remove(),o}function r(t,i){var a=t.getBoundingClientRect(),u=a.top,c=a.bottom,f=a.left,l=a.right,d=e.extend({tolerance:0,viewport:n},i),s=!1,p=d.viewport.jquery?d.viewport:e(d.viewport);p.length||(console.warn("isInViewport: The viewport selector you have provided matches no element on page."),console.warn("isInViewport: Defaulting to viewport as window"),p=e(n));var w=p.height(),h=p.width(),v=p[0].toString();if(p[0]!==n&&"[object Window]"!==v&&"[object DOMWindow]"!==v){var g=p[0].getBoundingClientRect();u-=g.top,c-=g.top,f-=g.left,l-=g.left,r.scrollBarWidth=r.scrollBarWidth||o(p),h-=r.scrollBarWidth}return d.tolerance=~~Math.round(parseFloat(d.tolerance)),d.tolerance<0&&(d.tolerance=w+d.tolerance),l<=0||f>=h?s:s=d.tolerance?u<=d.tolerance&&c>=d.tolerance:c>0&&u<=w}function i(n){if(n){var t=n.split(",");return 1===t.length&&isNaN(t[0])&&(t[1]=t[0],t[0]=void 0),{tolerance:t[0]?t[0].trim():void 0,viewport:t[1]?e(t[1].trim()):void 0}}return{}}e="default"in e?e.default:e,n="default"in n?n.default:n,
-    e.extend(e.expr[":"],{"in-viewport":e.expr.createPseudo?e.expr.createPseudo(function(e){return function(n){return r(n,i(e))}}):function(e,n,t){return r(e,i(t[3]))}}),e.fn.isInViewport=function(e){return this.filter(function(n,t){return r(t,e)})},e.fn.run=t});
-    //# isInViewport
-
-    // Play Video
-    $(function() {
-    var $video = $('.{{ post.id }}');
-    var $window = $(window);
-
-    $window.scroll(function() {
-    if ($video.is(":in-viewport")) {
-        $video[0].play();
-    } else {    
-        $video[0].pause();
-    }
-    });
-    });
-    </script>
     {% endif %}
     {% endfor %}
 </div>
@@ -133,6 +117,11 @@
         {% for user_sub in user.friendship_requests_from.all %}
         <div class="subscription">
             <a href="{% url 'users:profile' user_sub.to_user.id %}">{{ user_sub.to_user.username }}</a>{% if request.user == user %} <form style="display: inline;" action="{% url 'friends:delete_friend' user_sub.to_user.id %}" method="post">{% csrf_token %}<input type="hidden" name="req" value="{{ request.path }}?user=subscriptions"><button style="border: none;background: none;color: royalblue;text-decoration: underline;" type="submit">Отписаться</button></form>{% endif %}
+            {% for sub_friend in request.user.friendship_requests_to.all %}
+                {% if sub_friend.from_user == user_sub.to_user %}
+                    <i class="bi bi-person-check"></i>
+                {% endif %}
+            {% endfor %}
         </div>
         {% endfor %}
     {% endif %}

@@ -1,3 +1,6 @@
+body {
+    background-color: #F5F5F5;
+}
 .profile-picture{
     width: 150px;
     height: 150px;
@@ -322,11 +325,17 @@ a.btn.pull-right.no-style{
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
-    align-items: center;
+    padding: 50px 0;
+    /* height: 674px; */
+    /* align-items: center; */
+    box-shadow: 0px 2px 2px 0px black;
 }
 .profile-post {
     width: 40%;
-    background-color: aliceblue;
+    height: 100%;
+    /* background-color: aliceblue; */
+    background-color: #FFFAFA;
+    box-shadow: 0px 0px 1px 0px #999;
     padding: 10px 35px;
     /* margin: 0 60px 40px; */
     border-radius: 25px;
@@ -334,8 +343,33 @@ a.btn.pull-right.no-style{
     margin-bottom: 50px;
     /* display: inline-block; */
 }
-.profile-post img {
-    width: 100%;
+.frofile_post_file {
+    height: 450px;
+    width: 450px;
+    position: relative;
+    overflow: hidden;
+}
+.profile_post_file_containner {
+    height: 100%;
+    width: 850px;
+    /* display: block; */
+    margin-left: -200px;
+}
+.profile-post img, .profile-post video {
+    height: 100%;
+    display: block;
+    margin: auto;
+}
+.profile_post_file_containner i {
+    position: absolute;
+    top: 200px;
+    left: 200px;
+    font-size: 50px;
+    color: rgb(16, 138, 138);
+}
+.profile-post p {
+    overflow: hidden;
+    height: 26px;
 }
 .profile-black-box {
     position: fixed;
@@ -361,6 +395,6 @@ a.sub_exit {
     left: 35%;
     border-radius: 20px;
     top: 25%;
-    background-color: white;
+    background-color: #FFFAFA;
 }
 
