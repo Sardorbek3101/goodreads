@@ -93,16 +93,17 @@
         <h4>Подписчики</h4>
         {% for user_sub in user.friendship_requests_to.all %}
         <div class="subscriber">
-            <a href="{% url 'users:profile' user_sub.from_user.id %}">{{ user_sub.from_user.username }}</a> {% if user == request.user %} <a href="{% url 'friends:delete_request' user_sub.from_user.id %}">Удалить из подписчиков</a>
+            <a href="{% url 'users:profile' user_sub.from_user.id %}">{{ user_sub.from_user.username }}</a> {% if user == request.user %} <a href="{% url 'friends:delete_request' user_sub.from_user.id %}">Удалить</a>
             {% comment %} <a href="">{{ user_sub.from_user.id | check_podpiski }}</a> {% endcomment %}
             {% for sub_friend in request.user.friendship_requests_from.all %}
                 {% if sub_friend.to_user == user_sub.from_user %}
-                    <i class="bi bi-person-check"></i> <span style="display:none" id="check_podpiski_{{ user_sub.id }}">True</span>
+                    <a><i class="bi bi-person-check"></i></a> <span style="display:none" id="check_podpiski_{{ user_sub.id }}">True</span>
                 {% endif %}
             {% endfor %}
             <a id="pod_otvet_{{ user_sub.id }}" href="{% url 'friends:create_friendship' user_sub.from_user.id %}">Подписаться</a>
             {% endif %}
         </div>
+        <hr>
         <script>
             var sub_friend = document.getElementById("check_podpiski_{{ user_sub.id }}").innerHTML
             console.log(sub_friend)
@@ -115,14 +116,15 @@
     {% elif user_sub_req == "subscriptions" %}
         <h4>Подписки</h4>
         {% for user_sub in user.friendship_requests_from.all %}
-        <div class="subscription">
+        <div class="subscriber">
             <a href="{% url 'users:profile' user_sub.to_user.id %}">{{ user_sub.to_user.username }}</a>{% if request.user == user %} <form style="display: inline;" action="{% url 'friends:delete_friend' user_sub.to_user.id %}" method="post">{% csrf_token %}<input type="hidden" name="req" value="{{ request.path }}?user=subscriptions"><button style="border: none;background: none;color: royalblue;text-decoration: underline;" type="submit">Отписаться</button></form>{% endif %}
             {% for sub_friend in request.user.friendship_requests_to.all %}
                 {% if sub_friend.from_user == user_sub.to_user %}
-                    <i class="bi bi-person-check"></i>
+                    <a><i class="bi bi-person-check"></i></a>
                 {% endif %}
             {% endfor %}
         </div>
+        <hr>
         {% endfor %}
     {% endif %}
 </div>

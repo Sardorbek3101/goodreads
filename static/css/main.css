@@ -399,14 +399,39 @@ a.sub_exit {
     width: 30%;
     /* color: beige; */
     position: relative;
-    padding: 10px 10px;
+    padding: 10px 25px;
     height: 40%;
     left: 35%;
+    overflow: auto;
     border-radius: 20px;
     top: 25%;
     background-color: #FFFAFA;
 }
-
+.user_subs hr {
+    margin: 5px 0px;
+}
+.subscriber {
+    display: flex;
+    max-height: 25px;
+    justify-content: center;
+    /* overflow: auto; */
+    overflow-x: auto;
+    overflow-y: unset;
+}
+.subscriber a {
+    /* padding: 0 5px; */
+    width: 30%;
+    overflow: auto;
+}
+.subscriber a i {
+    text-align: center;
+}
+.subscriber a {
+    padding: 0 5px;
+}
+.user_subs h4 {
+    text-align: center;
+}
 .card-body {
     background-color: #FFFAFA;
 }

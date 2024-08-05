@@ -33,3 +33,4 @@ class FriendChat(models.Model):
 
     def __str__(self):
         return f"От {self.user} в чат"
+    
