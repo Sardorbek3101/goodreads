@@ -28,12 +28,15 @@
                 <form method="post" action="{% url 'posts:delete_like' %}">
                     {% csrf_token %}
                     <input name="post" type="hidden" value="{{ p.id }}">
+                    <input name="back_request" type="hidden" value="landing_page">
                     <button style="border:none; background:none;padding: unset" type="submit"><i style="color:red" class="bi bi-heart-fill"></i></button>{{ p.likes.all.count }}
                 </form>
             {% else %}
                 <form method="post" action="{% url 'posts:like' %}">
                     {% csrf_token %}
                     <input name="post" type="hidden" value="{{ p.id }}">
+                    <input name="back_request" type="hidden" value="landing_page">
+                    <input name="" type="hidden">
                     <button style="border:none; background:none;padding: unset" type="submit"><i class="bi bi-heart"></i></button>{{ p.likes.all.count }}
                     </form>
             {% endif %}

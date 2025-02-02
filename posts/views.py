@@ -107,32 +107,46 @@ class DeletePostCommentView(LoginRequiredMixin ,View):
 
 class LikeView(LoginRequiredMixin, View):
     def post(self, request):
+        back_request = request.POST['back_request']
+        def redirectt():
+            try:
+                kwargs = request.POST['kwargs']
+                return redirect(reverse(back_request, kwargs={'id':kwargs}))
+            except:
+                return redirect(back_request)
         try:
             post = Posts.objects.get(id = request.POST['post'])
         except:
             messages.warning(request, "По вашему запросу постов не найдено !")
-            return redirect('landing_page')
+            return redirectt()
         if not request.user in post.likes.all():
             post.likes.add(request.user)
             post.save()
-            return redirect('landing_page')
+            return redirectt()
         messages.warning(request, "Вы уже лайкали этот пост")
-        return redirect('landing_page')
+        return redirectt()
 
 
 class DeleteLikeView(LoginRequiredMixin, View):
     def post(self, request):
+        back_request = request.POST['back_request']
+        def redirectt():
+            try:
+                kwargs = request.POST['kwargs']
+                return redirect(reverse(back_request, kwargs={'id':kwargs}))
+            except:
+                return redirect(back_request)
         try:
             post = Posts.objects.get(id = request.POST['post'])
         except:
             messages.warning(request, "По вашему запросу постов не найдено !")
-            return redirect('landing_page')
+            return redirectt()
         if request.user in post.likes.all():
             post.likes.remove(request.user)
             post.save()
-            return redirect('landing_page')
+            return redirectt()
         messages.warning(request, "Вы ещё не лайкали этот пост")
-        return redirect('landing_page')
+        return redirectt()
 
 
 # class LikeView(LoginRequiredMixin, View):

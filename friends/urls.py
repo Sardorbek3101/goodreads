@@ -11,5 +11,5 @@ urlpatterns = [
     path("confirm/delete/friend/<int:id>/", ConfirmDeleteFriendshipView.as_view(), name="conf_del_friend"),
     path('delete/friend/<int:id>/', DeleteFriendshipView.as_view(), name="delete_friend"),
     path('chat/<int:id>/', FriendsChatView.as_view(), name="friends_chat"),
-    path('<int:id>/delete/message/<int:msg_id>/', DeleteMessageView.as_view(), name="delete_message"),
+    path('<int:id>/delete/message/<int:msg_id>/', DeleteMessageView.as_view(), name="delete_message"), 
 ]
